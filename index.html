@@ -12,100 +12,93 @@
         </style>
     </head>
     <body>
-        <script src="rAF.js"></script>
+        <script src="js/rAF.js"></script>
+        <script src="js/easing.js"></script>
+        
         <script>
             var myCanvas = document.createElement('canvas');
             myCanvas.width = window.innerWidth;
             myCanvas.height = window.innerHeight;
             document.body.appendChild(myCanvas);
             var ctx = myCanvas.getContext('2d');
-            //
-            
-            var allSquares = []
-            var visibleSquares =[]
-            
-           
+
+            var allSquares = [];
+            var visibleSquares =[];
+
             //fps =frame per second
-            var fps = 60;
-   
-            
+            var fps = 50;
+            //type of easing for all squares
+            var ease = 'easeInOutExpo';
             //animation of rectangle
-            var lastTime = 0;                  
-            animationLoop();
+            var lastTime = 0;
             
+            animationLoop();
+
             function animationLoop(time){
-                requestAnimationFrame(animationLoop)
-                
-              
-                
-                
+                requestAnimationFrame(animationLoop);
+
                 if(time - lastTime >= 1000/fps){
-                    //console.log(time - lastTime);
                     lastTime = time;
                     
-                    
-                    for(var i = 0; i<15; i++){
-                        
-                        //add new square
-                        allSquares.push({
-                            x:myCanvas.width/2,
-                            y:myCanvas.height/2,
-                            h:rand(6, 12),
-                            r:rand(150, 255),
-                            g:rand(0, 159),
-                            b:rand(0, 150),
-                            speedX:rand(-1000, 1000)/100,
-                            speedY:rand(-1000, 1000)/100
-                        })
+                    ctx.clearRect(0, 0, myCanvas.width, myCanvas.height); //clear canvas in every frame
+                    visibleSquares.length = 0;
 
-                        if(allSquares[allSquares.length-1].speedX === 0 && allSquares[allSquares.length-1].speedY === 0){
-                            allSquares[allSquares.length-1].speedX = rand(5, 20);
-                        } 
-                        
+                    for(var i = 0; i<10; i++){
+                        allSquares.push({
+                            start_x:myCanvas.width/2,
+                            start_y:myCanvas.height/2,
+                            h:rand(5, 15),
+                            //
+                            target_x:rand(0, Math.round(myCanvas.width)),
+                            target_y:rand(0, Math.round(myCanvas.height)),
+                            //
+                            t:0,    //current time
+                            d:2000, //time of animation
+                            //
+                            start_r:255,
+                            start_b:rand(0,240),
+                            start_g:rand(0,100)
+                        });
+
                     }
-                    
-                    
-                    /* ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);*/
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-                    ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
-                    
-                    visibleSquares.length= 0;
-                    
-                    for (var i=0; i<allSquares.length; i++){
+
+                    for(var i=0; i<allSquares.length; i++){
                         var square = allSquares[i];
-                        ctx.fillStyle = 'rgb('+square.r+', '+square.g+', '+square.b+')';
-                        square.x = square.x + square.speedX;
-                        square.y = square.y + square.speedY;
-                        
-                        square.speedY += 0.2;
-                        //square.speedX += square.speedX*0.06;
-                        // draw the first square
-                        
-                        square.r = Math.min(255, square.r+2);
-                        square.g = Math.min(255, square.g+2);
-                        square.b = Math.min(255, square.b+2);
+                        //growing time
+                        square.t += 1000/fps;
+
+                        //change color and position
+                        square.x = Easing.get(ease, square.start_x,  square.target_x, square.t, square.d);
+                        square.y = Easing.get(ease, square.start_y,  square.target_y, square.t, square.d);
+
+                        square.r = Easing.getRound(ease, square.start_r, 255, square.t, square.d);
+                        square.g = Easing.getRound(ease, square.start_g, 255, square.t, square.d);
+                        square.b = Easing.getRound(ease, square.start_b, 255, square.t, square.d);
+
+                        ctx.fillStyle = 'rgba('+square.r+', '+square.g+', '+square.b+',1)';
+
                         ctx.fillRect(square.x-square.h/2, square.y-square.h/2, square.h, square.h); 
-                        
-                        if(square.x + square.h/2>0 && square.x - square.h/2<myCanvas.width && square.y + square.h/2>0 && square.y+square.h/2<myCanvas.height && (square.r != 255 || square.g != 255 || square.b != 255)){
-                            visibleSquares.push(square)
+
+                        if(square.t < square.d){
+                            visibleSquares.push(square) //visible squares adding to array
                         }
-                        
+
                     }
-                    
-                    allSquares = visibleSquares.concat()
-                    
-                    if(allSquares.length>20){
-                        allSquares.shift()
-                    }
-                }  
-            }
+
+                    allSquares = visibleSquares.concat();
+
+                }
+            }  
             
-            
+
+
             function rand(min, max){
-                return Math.floor(Math.random()*(max-min + 1) + min)
+                return Math.floor(Math.random()*(max-min + 1) + min);
             }
-    
-            
+
+
+        
+        
         </script>
     </body>
 </html>
