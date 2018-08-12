@@ -28,7 +28,7 @@
             //fps =frame per second
             var fps = 50;
             //type of easing for all squares
-            var ease = 'easeInOutExpo';
+            var ease = 'easeInOutQuart';
             //animation of rectangle
             var lastTime = 0;
             
@@ -49,8 +49,8 @@
                             start_y:myCanvas.height/2,
                             h:rand(5, 15),
                             //
-                            target_x:rand(0, Math.round(myCanvas.width)),
-                            target_y:rand(0, Math.round(myCanvas.height)),
+                            target_r:Math.round(myCanvas.height*0.4),
+                            start_a:rand(0, 360),
                             //
                             t:0,    //current time
                             d:2000, //time of animation
@@ -66,16 +66,19 @@
                         var square = allSquares[i];
                         //growing time
                         square.t += 1000/fps;
+                        
+                        square.r = Easing.get(ease, 0, square.target_r, square.t, square.d);
+                        square.a = Easing.get(ease, square.start_a, square.start_a + 180, square.t, square.d);
 
                         //change color and position
-                        square.x = Easing.get(ease, square.start_x,  square.target_x, square.t, square.d);
-                        square.y = Easing.get(ease, square.start_y,  square.target_y, square.t, square.d);
+                        square.x = Math.sin(Math.PI/180 * square.a) * square.r + square.start_x;
+                        square.y = Math.cos(Math.PI/180 * square.a) * square.r + square.start_y;
 
                         square.r = Easing.getRound(ease, square.start_r, 255, square.t, square.d);
                         square.g = Easing.getRound(ease, square.start_g, 255, square.t, square.d);
                         square.b = Easing.getRound(ease, square.start_b, 255, square.t, square.d);
 
-                        ctx.fillStyle = 'rgba('+square.r+', '+square.g+', '+square.b+',1)';
+                        ctx.fillStyle = 'rgba('+square.start_r+', '+square.start_g+', '+square.start_b+',1)';
 
                         ctx.fillRect(square.x-square.h/2, square.y-square.h/2, square.h, square.h); 
 
