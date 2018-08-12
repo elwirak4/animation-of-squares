@@ -15,25 +15,18 @@
         <script src="rAF.js"></script>
         <script>
             var myCanvas = document.createElement('canvas');
-            myCanvas.width = 500;
-            myCanvas.height = 500;
+            myCanvas.width = window.innerWidth;
+            myCanvas.height = window.innerHeight;
             document.body.appendChild(myCanvas);
             var ctx = myCanvas.getContext('2d');
             //
-            var x = myCanvas.width/2;
-            var y = myCanvas.height/2;
-            //square size
-            var h = rand(10, 30);
-            var r = rand(0, 240);
-            var g = rand(0, 240);
-            var b = rand(0, 240);
-            var speedX = rand(-1000, 1000)/100;
-            var speedY = rand(-1000, 1000)/100;
-            if(speedX === 0 && speedY === 0){
-                speedX = rand(5, 20);
-            }
+            
+            var allSquares = []
+            var visibleSquares =[]
+            
+           
             //fps =frame per second
-            var fps = 20;
+            var fps = 60;
    
             
             //animation of rectangle
@@ -42,18 +35,68 @@
             
             function animationLoop(time){
                 requestAnimationFrame(animationLoop)
+                
+              
+                
+                
                 if(time - lastTime >= 1000/fps){
                     //console.log(time - lastTime);
                     lastTime = time;
-                   /* ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);*/
+                    
+                    
+                    for(var i = 0; i<15; i++){
+                        
+                        //add new square
+                        allSquares.push({
+                            x:myCanvas.width/2,
+                            y:myCanvas.height/2,
+                            h:rand(6, 12),
+                            r:rand(150, 255),
+                            g:rand(0, 159),
+                            b:rand(0, 150),
+                            speedX:rand(-1000, 1000)/100,
+                            speedY:rand(-1000, 1000)/100
+                        })
+
+                        if(allSquares[allSquares.length-1].speedX === 0 && allSquares[allSquares.length-1].speedY === 0){
+                            allSquares[allSquares.length-1].speedX = rand(5, 20);
+                        } 
+                        
+                    }
+                    
+                    
+                    /* ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);*/
                     ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
                     ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
-                    ctx.fillStyle = 'rgb('+r+', '+g+', '+b+')';
-
-                    x = x + speedX;
-                    y = y + speedY;
-                    // draw the first square
-                    ctx.fillRect(x-h/2, y-h/2, h, h); 
+                    
+                    visibleSquares.length= 0;
+                    
+                    for (var i=0; i<allSquares.length; i++){
+                        var square = allSquares[i];
+                        ctx.fillStyle = 'rgb('+square.r+', '+square.g+', '+square.b+')';
+                        square.x = square.x + square.speedX;
+                        square.y = square.y + square.speedY;
+                        
+                        square.speedY += 0.2;
+                        //square.speedX += square.speedX*0.06;
+                        // draw the first square
+                        
+                        square.r = Math.min(255, square.r+2);
+                        square.g = Math.min(255, square.g+2);
+                        square.b = Math.min(255, square.b+2);
+                        ctx.fillRect(square.x-square.h/2, square.y-square.h/2, square.h, square.h); 
+                        
+                        if(square.x + square.h/2>0 && square.x - square.h/2<myCanvas.width && square.y + square.h/2>0 && square.y+square.h/2<myCanvas.height && (square.r != 255 || square.g != 255 || square.b != 255)){
+                            visibleSquares.push(square)
+                        }
+                        
+                    }
+                    
+                    allSquares = visibleSquares.concat()
+                    
+                    if(allSquares.length>20){
+                        allSquares.shift()
+                    }
                 }  
             }
             
