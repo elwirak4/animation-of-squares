@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Flying squares</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <script src="rAF.js"></script>
+        <script>
+            var myCanvas = document.createElement('canvas');
+            myCanvas.width = 500;
+            myCanvas.height = 500;
+            document.body.appendChild(myCanvas);
+            var ctx = myCanvas.getContext('2d');
+            //
+            var x = myCanvas.width/2;
+            var y = myCanvas.height/2;
+            //square size
+            var h = rand(10, 30);
+            var r = rand(0, 240);
+            var g = rand(0, 240);
+            var b = rand(0, 240);
+            var speedX = rand(-1000, 1000)/100;
+            var speedY = rand(-1000, 1000)/100;
+            if(speedX === 0 && speedY === 0){
+                speedX = rand(5, 20);
+            }
+            //fps =frame per second
+            var fps = 20;
+   
+            
+            //animation of rectangle
+            var lastTime = 0;                  
+            animationLoop();
+            
+            function animationLoop(time){
+                requestAnimationFrame(animationLoop)
+                if(time - lastTime >= 1000/fps){
+                    //console.log(time - lastTime);
+                    lastTime = time;
+                   /* ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);*/
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.fillRect(0, 0, myCanvas.width, myCanvas.height);
+                    ctx.fillStyle = 'rgb('+r+', '+g+', '+b+')';
+
+                    x = x + speedX;
+                    y = y + speedY;
+                    // draw the first square
+                    ctx.fillRect(x-h/2, y-h/2, h, h); 
+                }  
+            }
+            
+            
+            function rand(min, max){
+                return Math.floor(Math.random()*(max-min + 1) + min)
+            }
+    
+            
+        </script>
+    </body>
+</html>
